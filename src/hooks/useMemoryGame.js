@@ -1,13 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { shuffle } from "../utils";
 
-const PAIRS = 4;
+const deal = (theme, pairs) =>
+  shuffle(shuffle(theme.items).slice(0, pairs).flatMap((item) => [item, item])).map((item, id) => ({ ...item, id }));
 
-const deal = (theme) =>
-  shuffle(shuffle(theme.items).slice(0, PAIRS).flatMap((item) => [item, item])).map((item, id) => ({ ...item, id }));
-
-export default function useMemoryGame(theme) {
-  const [cards, setCards] = useState(() => deal(theme));
+export default function useMemoryGame(theme, pairs) {
+  const [cards, setCards] = useState(() => deal(theme, pairs));
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
   const [moves, setMoves] = useState(0);
@@ -41,7 +39,7 @@ export default function useMemoryGame(theme) {
 
   const restart = () => {
     clearTimeout(pending.current);
-    setCards(deal(theme));
+    setCards(deal(theme, pairs));
     setFlipped([]);
     setMatched([]);
     setMoves(0);

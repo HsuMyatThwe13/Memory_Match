@@ -1,6 +1,6 @@
-export default function Button({ children, onClick, autoFocus }) {
+export default function Button({ children, onClick, disabled, ...rest }) {
   return (
-    <button className="btn" onClick={onClick} autoFocus={autoFocus}>
+    <button className="btn" onClick={onClick} disabled={disabled} {...rest}>
       {children}
     </button>
   );

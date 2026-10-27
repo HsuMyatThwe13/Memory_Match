@@ -1,6 +1,7 @@
-export default function ThemeCard({ theme, onPick }) {
+export default function ThemeCard({ theme, selected, onPick }) {
   return (
-    <button className="theme" onClick={() => onPick(theme)} aria-label={`Play with ${theme.label}`}>
+    <button className={`theme${selected ? " on" : ""}`} onClick={() => onPick(theme)}
+      aria-pressed={selected} aria-label={`${theme.label} theme`}>
       <img src={theme.cover} alt="" draggable="false" />
       <span>{theme.label}</span>
     </button>
