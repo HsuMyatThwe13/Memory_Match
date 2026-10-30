@@ -12,14 +12,14 @@ export default function ThemeScreen({ onPlay, onBack }) {
   const ready = theme && level;
 
   return (
-    <Screen bg={MENU_BG}>
+    <Screen bg={MENU_BG} className="menu">
       <div className="top"><Button onClick={onBack}>Back</Button></div>
       <h1 className="title">Choose a theme</h1>
       <div className="themes">
         {THEMES.map((t) => <ThemeCard key={t.id} theme={t} selected={theme?.id === t.id} onPick={setTheme} />)}
       </div>
       <h2 className="title sub">Choose a level</h2>
-      <div className="row">
+      <div className="row levels">
         {LEVELS.map((l) => (
           <Chip key={l.id} selected={level?.id === l.id} onClick={() => setLevel(l)}>
             {l.label} · {theme ? pairsFor(theme, l) : l.pairs} pairs
