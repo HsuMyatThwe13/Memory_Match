@@ -24,3 +24,10 @@ export const THEMES = [
       ["orange", "Orange"], ["pink", "Pink"], ["purple", "Purple"], ["red", "Red"], ["yellow", "Yellow"]]),
   },
 ];
+
+export const MIXED = {
+  id: "mixed",
+  label: "Mixed",
+  bg: bg("bgDefault"),
+  items: THEMES.flatMap((t) => t.items),
+};
