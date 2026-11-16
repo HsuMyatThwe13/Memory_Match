@@ -5,7 +5,7 @@ import { PEEK_MS, FREEZE_SECONDS } from "../data/powerups";
 const deal = (theme, pairs) =>
   shuffle(shuffle(theme.items).slice(0, pairs).flatMap((item) => [item, item])).map((item, id) => ({ ...item, id }));
 
-export default function useMemoryGame(theme, pairs, { seconds = 0, onSpend } = {}) {
+export default function useMemoryGame(theme, pairs, { seconds = 0, onSpend, paused = false } = {}) {
   const [cards, setCards] = useState(() => deal(theme, pairs));
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
@@ -27,10 +27,10 @@ export default function useMemoryGame(theme, pairs, { seconds = 0, onSpend } = {
   const [matchDelay, missDelay] = seconds ? [400, 700] : [500, 900];
 
   useEffect(() => {
-    if (!started || over) return;
+    if (!started || over || paused) return;
     const t = setInterval(() => (frozen ? setFreezeLeft((f) => Math.max(0, f - 1)) : setTime((s) => s + 1)), 1000);
     return () => clearInterval(t);
-  }, [started, over, frozen]);
+  }, [started, over, frozen, paused]);
 
   useEffect(() => () => {
     clearTimeout(pending.current);
@@ -77,6 +77,20 @@ export default function useMemoryGame(theme, pairs, { seconds = 0, onSpend } = {
     return true;
   };
 
+  const cheatWin = () => {
+    clearTimeout(pending.current);
+    setFlipped([]);
+    setMatched(cards.map((c) => c.id));
+    setStarted(true);
+  };
+
+  const cheatLose = () => {
+    clearTimeout(pending.current);
+    setFlipped([]);
+    setStarted(true);
+    if (seconds) setTime(seconds);
+  };
+
   const restart = () => {
     clearTimeout(pending.current);
     clearTimeout(peekTimer.current);
@@ -94,6 +108,6 @@ export default function useMemoryGame(theme, pairs, { seconds = 0, onSpend } = {
 
   return {
     cards, flipped, matched, moves, wrong, time, remaining, started, won, lost, peeking, freezeLeft, used,
-    score: matched.length / 2, canUse, flip, use, restart,
+    score: matched.length / 2, canUse, flip, use, restart, cheatWin, cheatLose,
   };
 }

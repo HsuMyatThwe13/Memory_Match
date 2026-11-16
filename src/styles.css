@@ -370,6 +370,14 @@ body {
     border-color 0.15s,
     transform 0.15s;
 }
+.mode img {
+  width: 100%;
+  display: block;
+  aspect-ratio: 5 / 4;
+  object-fit: cover;
+  border-radius: 6px;
+  image-rendering: pixelated;
+}
 .mode strong {
   font-size: clamp(16px, 3vw, 22px);
 }
@@ -630,4 +638,49 @@ button.power:hover:not(:disabled) {
 }
 .bcards .power {
   flex: none;
+}
+.row.reverse {
+  flex-direction: row-reverse;
+}
+.testlinks {
+  position: fixed;
+  right: 14px;
+  bottom: 8px;
+  z-index: 5;
+  display: flex;
+  gap: 14px;
+}
+.testlink {
+  color: #d00000;
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 0 3px #fff;
+}
+.screen.modescreen {
+  justify-content: center;
+  padding: 20px;
+}
+.screen.modescreen .top {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: min(calc(100% - 40px), 1100px);
+}
+.modewrap {
+  position: relative;
+}
+.modewrap .title {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  margin-bottom: clamp(20px, 5vh, 48px);
+  white-space: nowrap;
+}
+@media (max-height: 560px) {
+  .screen.modescreen {
+    padding-top: 120px;
+  }
 }
