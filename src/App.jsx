@@ -28,6 +28,16 @@ export default function App() {
   const playClassic = (theme, level) => start({ mode: "classic", theme, level, pairs: pairsFor(theme, level), loadout: [] });
   const playTimer = (loadout) => start({ mode: "timer", theme: MIXED, level: null, pairs: TIMER_PAIRS, loadout });
 
+  const leave = (action) => () => {
+    action();
+    setScreen("home");
+  };
+  const deleteAccount = async () => {
+    const result = await player.deleteAccount();
+    if (result.ok) setScreen("home");
+    return result;
+  };
+
   const finish = (r) => {
     if (setup.mode === "classic") {
       setEarned(player.recordClassic({ ...r, theme: setup.theme, level: setup.level, pairs: setup.pairs }));
@@ -56,9 +66,9 @@ export default function App() {
         onReplay={() => (setup.mode === "timer" ? setScreen("loadout") : playClassic(setup.theme, setup.level))} />;
     case "history":
       return <HistoryScreen name={player.name} profile={player.profile} saved={player.saved} onBack={() => setScreen("home")}
-        onExport={player.exportCurrent} onImport={player.importFile} onReset={player.resetProgress} />;
+        onReset={player.resetProgress} onSignOut={leave(player.signOut)} onDelete={deleteAccount} />;
     default:
-      return <HomeScreen name={player.name} names={player.names} onSignIn={player.signIn} onSignOut={player.signOut}
+      return <HomeScreen name={player.name} onCheck={player.checkName} onSignIn={player.signIn} onSignOut={player.signOut}
         onPlay={() => setScreen("mode")} onHistory={() => setScreen("history")} />;
   }
 }

@@ -1,6 +1,6 @@
 # Memory Match
 
-A card-matching memory game built with **React 18 + Vite 5** (vibe-coded, frontend only, no backend).
+A card-matching memory game built with **React 18 + Vite 5** (vibe-coded) with a small serverless API for player accounts.
 
 **Live demo:** https://memory-match-psi-dun.vercel.app
 
@@ -12,7 +12,7 @@ A card-matching memory game built with **React 18 + Vite 5** (vibe-coded, fronte
   - **Peek** (win Low in under 8 moves): reveals all unmatched cards for 3 s.
   - **Auto-Match** (win Medium with 3 or fewer wrong flips): matches one pair for you.
   - **Freeze** (win High with 6 or fewer wrong flips): pauses the timer for 10 s.
-- **Player profiles and History Hub** – progress and the last 50 games per mode are saved in the browser (`localStorage`). Backups can be exported and imported as a JSON file.
+- **Accounts and History Hub** – the game first asks for your nickname, then for a 4-digit PIN. A new nickname is created with the PIN you choose; an existing nickname opens only with its own PIN. Nicknames are case sensitive (`ann` and `Ann` are different players). Your cards and the last 50 games per mode show on any device where you sign in with the matching nickname and PIN. In the History Hub you can reset your progress, sign out, or permanently delete your account (the nickname can then be used again).
 - **Idle protection** – a warning appears after 3 minutes without activity, then the game times out 30 s later.
 - **Responsive layout** – works on phones (portrait and landscape), iPad, laptop and desktop. The card board picks the grid shape and card size that fit the screen, so no scrolling is needed during a game.
 
@@ -26,6 +26,24 @@ npm test         # run the automated test suite once
 npm run test:watch
 ```
 
+## Accounts and the database
+
+Accounts are stored on the server, so the same nickname and PIN show the same data on every device.
+
+- **Server code** is in `api/`: `check` (does this nickname exist?), `login` (create or open an account), `save` (store progress) and `delete` (remove an account). PINs are never stored; only a salted `scrypt` hash is kept. After 8 wrong PINs an account is locked for 15 minutes. Progress is validated and size-limited before it is stored.
+- **Browser code** keeps a copy in `localStorage` so the History Hub loads quickly. The PIN is kept only for the current browser tab, so closing the tab signs you out.
+- **Local development:** `npm run dev` serves the same API from memory, so accounts reset when the dev server restarts. No setup is needed.
+- **Offline:** you need a connection to sign in. If a save fails during a game, the History Hub shows a warning and the next game retries.
+- **If two devices play at the same time,** the last save wins.
+
+### Setting up the database on Vercel (one time)
+
+1. Open your project on vercel.com, then **Storage** (or the **Marketplace**) and create an **Upstash Redis** database (the free plan is enough).
+2. Connect the database to this project. Vercel adds the connection settings (`UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`, or the `KV_REST_API_*` names) as environment variables.
+3. **Redeploy** the project, because new environment variables only apply to new deployments.
+
+Until this is done, signing in on the deployed site shows "The database is not set up yet." Accounts are never kept in memory in production.
+
 ## Project structure
 
 ```
@@ -36,8 +54,10 @@ src/
   hooks/             useMemoryGame (core rules), usePlayer (profiles), useInactivity, useViewport
   layout.js          picks the board grid and card size for the screen
   data/              levels, themes, power-ups, reward rules, idle settings
-  storage.js         localStorage load/save, input sanitising, backup import/export
+  storage.js         localStorage cache and input sanitising
+  api.js             browser calls to the server (login, save)
   __tests__/         automated tests (Vitest)
+api/                 serverless functions: check, login, save, delete (PIN hashing, validation, database)
 QA.md                test strategy, manual test cases, results, bug log
 ```
 
@@ -50,8 +70,9 @@ Automated tests use **Vitest**, **jsdom** and **React Testing Library** with fak
 | Area | File | What is checked |
 | --- | --- | --- |
 | Game rules | `useMemoryGame.test.js` | dealing, match and mismatch, win, restart, countdown, pause, loss, all three power-ups |
-| Player data | `usePlayer.test.js` | sign-in, reward awards, spending cards, history cap, per-player data, backup round trip |
-| Storage and validation | `storage.test.js` | name sanitising, corrupt data, quota failure, invalid backups, prototype-pollution keys |
+| Player accounts (browser) | `usePlayer.test.js` | nickname check, PIN sign-in, case-sensitive nicknames, same data on a new device, reload refresh, saving, offline errors, delete account, reward awards, history cap |
+| Server API | `api.test.js` | nickname check, account creation, case-sensitive nicknames, PIN checks and hashing, lockout, open-only requests, save and sanitising, delete account, routing and errors |
+| Storage and validation | `storage.test.js` | name sanitising, corrupt data, quota failure, prototype-pollution keys |
 | Reward rules and data | `rewards.test.js` | boundary values for every reward, theme data integrity |
 | Idle timeout | `useInactivity.test.js` | warning, timeout, reset, disabled |
 | Responsive layout | `layout.test.js` | board grid fits phone, iPad, laptop and desktop sizes at every card count; size limits |
@@ -67,7 +88,7 @@ npm test         # run all tests once (about 5 seconds)
 npm run test:watch   # re-run automatically when you save a file
 ```
 
-A passing run ends with `Test Files 7 passed` and `Tests 105 passed`. These tests check the game logic, not the screens.
+A passing run ends with `Test Files 8 passed` and `Tests 167 passed`. These tests check the game logic, not the screens.
 
 ### Manual tests
 

@@ -40,7 +40,8 @@ button {
   padding-top: 56dvh;
   height: 100vh;
   height: 100dvh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .top {
   width: min(100%, 1100px);
@@ -339,30 +340,36 @@ button {
   font-size: clamp(14px, 2.4vw, 18px);
   font-weight: 600;
   color: #fff;
-  text-shadow: 2px 2px 0 #1d4a8a;
+  text-shadow: 1px 1px 2px #1d4a8a99;
 }
 .namebox {
-  gap: 10px;
-  padding: 16px 22px;
+  gap: 6px;
+  padding: 10px 16px;
+  border-width: 3px;
+  box-shadow: 0 4px 0 #3b2410;
 }
 .nlabel {
   font-weight: 600;
-  font-size: clamp(16px, 3vw, 22px);
+  font-size: clamp(14px, 2.4vw, 17px);
 }
 .nick {
   font: inherit;
-  font-size: clamp(14px, 2.6vw, 20px);
-  padding: 8px 12px;
-  width: clamp(150px, 30vw, 240px);
+  font-size: clamp(13px, 2.2vw, 16px);
+  padding: 5px 10px;
+  width: clamp(140px, 28vw, 210px);
   color: #10243a;
   background: #fff;
-  border: 3px solid #3b2410;
-  border-radius: 10px;
+  border: 2px solid #3b2410;
+  border-radius: 8px;
 }
 .home .namebox .btn {
-  font-size: clamp(14px, 2.6vw, 20px);
-  padding: 6px 22px;
-  min-height: 44px;
+  font-size: clamp(13px, 2.2vw, 16px);
+  padding: 3px 20px;
+  min-height: 36px;
+  border-width: 2px;
+}
+.namebox .link {
+  font-size: 12px;
 }
 .modes {
   display: flex;
@@ -494,7 +501,7 @@ button.power:hover:not(:disabled) {
   color: #fff;
   font-weight: 600;
   text-align: center;
-  text-shadow: 2px 2px 0 #1d4a8a;
+  text-shadow: 1px 1px 2px #1d4a8a99;
   font-size: clamp(14px, 2.6vw, 18px);
 }
 .hint2 {
@@ -754,4 +761,37 @@ button.power:hover:not(:disabled) {
   .top {
     width: min(100%, 1300px);
   }
+}
+
+/* Sign-in form */
+.nick.pin {
+  width: clamp(100px, 20vw, 130px);
+  letter-spacing: 4px;
+}
+.formnote {
+  margin: 0;
+  max-width: 36ch;
+  font-size: clamp(10px, 1.8vw, 12px);
+  font-weight: 400;
+  text-align: center;
+}
+.formerr {
+  margin: 0;
+  max-width: 36ch;
+  font-size: clamp(11px, 2vw, 13px);
+  font-weight: 600;
+  color: #b00020;
+  text-align: center;
+}
+@media (max-height: 480px) {
+  .formnote {
+    display: none;
+  }
+}
+
+/* no focus/hover outline around the nickname and PIN fields */
+.nick:hover,
+.nick:focus,
+.nick:focus-visible {
+  outline: none;
 }

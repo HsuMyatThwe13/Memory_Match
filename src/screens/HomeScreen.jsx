@@ -3,7 +3,7 @@ import Button from "../components/Button";
 import NameForm from "../components/NameForm";
 import { HOME_BG } from "../data/themes";
 
-export default function HomeScreen({ name, names, onSignIn, onSignOut, onPlay, onHistory }) {
+export default function HomeScreen({ name, onCheck, onSignIn, onSignOut, onPlay, onHistory }) {
   return (
     <Screen bg={HOME_BG} className="home">
       <h1 className="sr">Memory Match</h1>
@@ -19,7 +19,7 @@ export default function HomeScreen({ name, names, onSignIn, onSignOut, onPlay, o
           </p>
         </>
       ) : (
-        <NameForm names={names} onSubmit={onSignIn} />
+        <NameForm onCheck={onCheck} onSubmit={onSignIn} />
       )}
     </Screen>
   );

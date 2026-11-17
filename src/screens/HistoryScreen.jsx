@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Screen from "../components/Screen";
 import Button from "../components/Button";
 import Panel from "../components/Panel";
@@ -7,7 +7,7 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { THEMES, MENU_BG } from "../data/themes";
 import { LEVELS } from "../data/levels";
 import { POWERUPS, POWERUP_IDS } from "../data/powerups";
-import { fmt, downloadText } from "../utils";
+import { fmt } from "../utils";
 
 const labelOf = (list, id) => list.find((x) => x.id === id)?.label ?? "-";
 const date = (ts) => (ts ? new Date(ts).toLocaleDateString() : "-");
@@ -27,15 +27,21 @@ function Table({ label, head, rows }) {
   );
 }
 
-export default function HistoryScreen({ name, profile, saved, onBack, onExport, onImport, onReset }) {
+export default function HistoryScreen({ name, profile, saved, onBack, onReset, onSignOut, onDelete }) {
   const [message, setMessage] = useState("");
   const [confirming, setConfirming] = useState(false);
-  const fileInput = useRef(null);
+  const [signingOut, setSigningOut] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [busy, setBusy] = useState(false);
 
-  const pickFile = async (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (file) setMessage(onImport(await file.text()));
+  const deleteAccount = async () => {
+    setBusy(true);
+    const result = await onDelete();
+    if (!result.ok) {
+      setBusy(false);
+      setDeleting(false);
+      setMessage(result.error);
+    }
   };
 
   const classic = profile.classic.map((e) => [
@@ -65,15 +71,23 @@ export default function HistoryScreen({ name, profile, saved, onBack, onExport, 
           <Table label="Timer history" head={["Date", "Result", "Left / found", "Cards used"]} rows={timer} />
         </Panel>
         <div className="row">
-          <Button onClick={() => downloadText(`memorymatch-${name}.json`, onExport())}>Export</Button>
-          <Button onClick={() => fileInput.current.click()}>Import</Button>
           <Button onClick={() => setConfirming(true)}>Reset progress</Button>
-          <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={pickFile} />
+          <Button onClick={() => setSigningOut(true)}>Sign out</Button>
+          <Button onClick={() => setDeleting(true)}>Delete account</Button>
         </div>
         <p className="msg" role="status">
-          {message || (saved ? "" : "This browser cannot save progress (private window?). Use Export to keep a backup.")}
+          {message || (saved ? "" : "Your latest progress could not be saved to the server. It will try again after your next game.")}
         </p>
       </div>
+      {signingOut && (
+        <ConfirmDialog title="Sign out?" confirmLabel="Sign out" onCancel={() => setSigningOut(false)}
+          text={`You will need the nickname and PIN to open ${name} again.`} onConfirm={onSignOut} />
+      )}
+      {deleting && (
+        <ConfirmDialog title="Delete account?" confirmLabel={busy ? "Deleting..." : "Delete"} onCancel={() => !busy && setDeleting(false)}
+          text={`This permanently deletes ${name} and all its cards and history on every device. It cannot be undone.`}
+          onConfirm={() => !busy && deleteAccount()} />
+      )}
       {confirming && (
         <ConfirmDialog title="Reset progress?" confirmLabel="Reset" onCancel={() => setConfirming(false)}
           text={`This clears all cards and history for ${name}. It cannot be undone.`}

@@ -1,6 +1,5 @@
 const KEY = "memorymatch:v1";
 const MAX_HISTORY = 50;
-const MAX_FILE = 200000;
 
 export const CARD_IDS = ["peek", "autoMatch", "freeze"];
 
@@ -60,22 +59,4 @@ export function saveStore(store) {
   } catch {
     return false;
   }
-}
-
-export const exportText = (name, profile) =>
-  JSON.stringify({ app: "memorymatch", version: 1, player: name, profile }, null, 2);
-
-export function parseImport(text) {
-  if (typeof text !== "string" || text.length > MAX_FILE) throw new Error("That file is too big.");
-  let data;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    throw new Error("That is not a Memory Match backup file.");
-  }
-  const name = cleanName(data?.player);
-  if (data?.app !== "memorymatch" || !name || !data.profile || typeof data.profile !== "object") {
-    throw new Error("That is not a Memory Match backup file.");
-  }
-  return { name, profile: cleanProfile(data.profile) };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { cleanName, cleanProfile, emptyProfile, loadStore, saveStore, exportText, parseImport } from "../storage";
+import { cleanName, cleanProfile, emptyProfile, loadStore, saveStore } from "../storage";
 
 beforeEach(() => localStorage.clear());
 
@@ -65,23 +65,5 @@ describe("loadStore / saveStore", () => {
   it("reports failure when storage is full or blocked", () => {
     vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => { throw new Error("quota"); });
     expect(saveStore(loadStore())).toBe(false);
-  });
-});
-
-describe("backup export / import", () => {
-  it("round-trips through export and import", () => {
-    const { name, profile } = parseImport(exportText("Ann", emptyProfile()));
-    expect(name).toBe("Ann");
-    expect(profile).toEqual(emptyProfile());
-  });
-  it.each([
-    ["not json", "{{{"],
-    ["wrong app", JSON.stringify({ app: "other", player: "A", profile: {} })],
-    ["missing player", JSON.stringify({ app: "memorymatch", profile: {} })],
-    ["missing profile", JSON.stringify({ app: "memorymatch", player: "A" })],
-    ["too big", "x".repeat(200001)],
-    ["non-string", 42],
-  ])("rejects invalid backup: %s", (_label, text) => {
-    expect(() => parseImport(text)).toThrow();
   });
 });
