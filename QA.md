@@ -9,12 +9,12 @@ Stack: React 18 + Vite 5 frontend, Vercel serverless API (`api/`) with an Upstas
 | --- | --- | --- |
 | Unit testing | Vitest on pure logic (rewards, storage, utils, data, responsive layout) | Done, automated |
 | Component/hook testing | React Testing Library `renderHook` with fake timers for game rules, player profile and idle timeout | Done, automated |
-| Functional (manual) | 10 test cases in the browser (section 4) | TC-03 to TC-09 pass; TC-01, TC-02 and TC-10 changed (two-step sign-in, case-sensitive nicknames, account menu) and need to be run again |
+| Functional (manual) | 10 test cases in the browser (section 4) | Done, all 10 pass (also tested on the live site on a computer and an iPad) |
 | Boundary value testing | Reward thresholds, 12-character names, 4-digit PIN lengths, 50-entry history cap, 999 card cap, PIN lockout after 8 tries | Done, automated |
 | Negative/security testing | Wrong and malformed PINs, taken nicknames, case-sensitive nicknames, PIN lockout, PIN hashing, tampered progress, refresh that must not create accounts, corrupt `localStorage`, markup in names, `__proto__` keys, storage and server failures | Done, automated |
 | Regression | `npm test` runs all 167 tests in about 5 seconds | Done |
 
-Out of scope: load/performance testing, the real Upstash database (tests use an in-memory copy with the same behaviour), and end-to-end browser automation (not set up).
+Out of scope: load/performance testing and end-to-end browser automation (not set up). The automated tests use an in-memory copy of the database with the same behaviour; the real Upstash database was checked by hand on the live site (section 4).
 
 ## 2. Automated test results
 
@@ -63,8 +63,8 @@ Clear site data (`localStorage` key `memorymatch:v1`) or use a private window be
 
 | ID | Area | Steps | Expected | Result |
 | --- | --- | --- | --- | --- |
-| TC-01 | Two-step sign-in | The game asks for the nickname only. Enter a new nickname, press Next, then enter a 4-digit PIN; try an empty nickname and a PIN shorter than 4 digits | Nickname step comes first; Next is disabled for an empty nickname; the PIN step says the nickname is new; Create is disabled until 4 digits; the account opens Home | Not run (changed) |
-| TC-02 | Same data on another device | Play a game, then on another device or browser enter the same nickname, then the same PIN; try again with a wrong PIN; try the nickname with different capital letters | Cards and history appear; a wrong PIN shows "Wrong PIN for this nickname." and does not open; `ann` and `Ann` are different players | Not run (changed) |
+| TC-01 | Two-step sign-in | The game asks for the nickname only. Enter a new nickname, press Next, then enter a 4-digit PIN; try an empty nickname and a PIN shorter than 4 digits | Nickname step comes first; Next is disabled for an empty nickname; the PIN step says the nickname is new; Create is disabled until 4 digits; the account opens Home | Pass |
+| TC-02 | Same data on another device | Play a game, then on another device or browser enter the same nickname, then the same PIN; try again with a wrong PIN; try the nickname with different capital letters | Cards and history appear; a wrong PIN shows "Wrong PIN for this nickname." and does not open; `ann` and `Ann` are different players | Pass |
 | TC-03 | Classic game | Play Animals at Low, Medium and High | 8, 12 and 18 cards; matched pairs stay up, mismatches flip back; result screen shows moves and time | Pass |
 | TC-04 | Rapid clicking | Click many cards quickly | No more than two cards open, no stuck cards | Pass |
 | TC-05 | Reward cards | Win Low in under 8 moves, then in 8 or more | Peek card awarded only for the fast win | Pass |
@@ -72,7 +72,7 @@ Clear site data (`localStorage` key `memorymatch:v1`) or use a private window be
 | TC-07 | Benefit cards in Timer mode | Use Peek, Auto-Match and Freeze | Peek shows cards about 3 s; Auto-Match matches one pair; Freeze holds the clock 10 s; each card count drops by 1 | Pass |
 | TC-08 | Idle protection | Leave a game untouched for 3 minutes, then respond or ignore | Warning dialog with 30 s countdown; responding continues the game; ignoring ends it | Pass |
 | TC-09 | History Hub | Play several games, open History Hub | Newest games first, with card counts | Pass |
-| TC-10 | Account menu | In History Hub: press Reset progress and confirm; press Sign out and cancel, then confirm; sign in again and press Delete account, cancel, then confirm; then use the same nickname again | Reset clears cards and history; Sign out returns to the nickname step and needs the PIN again; Delete removes the account and its data on every device, and the nickname can be created again with a new PIN and starts empty | Not run (changed) |
+| TC-10 | Account menu | In History Hub: press Reset progress and confirm; press Sign out and cancel, then confirm; sign in again and press Delete account, cancel, then confirm; then use the same nickname again | Reset clears cards and history; Sign out returns to the nickname step and needs the PIN again; Delete removes the account and its data on every device, and the nickname can be created again with a new PIN and starts empty | Pass |
 
 ### Responsive checks
 
@@ -88,7 +88,19 @@ Checked in the browser with device-size emulation, on Home, Mode, Theme, Loadout
 | Laptop 1366x768 | Pass |
 | Desktop 1920x1080 | Pass |
 
-Not tested on real devices or real Safari. Menu, history and how-to screens scroll vertically on short screens by design.
+Menu, history and how-to screens scroll vertically on short screens by design.
+
+### Live site checks
+
+Checked by the team on https://memory-match-psi-dun.vercel.app after the Upstash Redis database was connected and the site was redeployed.
+
+| Check | Device | Result |
+| --- | --- | --- |
+| Create a nickname with a PIN, open it again with the PIN | Computer (browser) | Pass |
+| Create a nickname with a PIN, open it again with the PIN | iPad | Pass |
+| Same nickname and PIN shows the same data and history on both devices | Computer and iPad | Pass |
+
+Layout was checked with device-size emulation (table above) and on the iPad. A real phone was not tested.
 
 ## 5. Observations from code review
 
@@ -110,8 +122,8 @@ Not tested on real devices or real Safari. Menu, history and how-to screens scro
 | BUG-01 | Cards were tiny on phones and left most of the screen empty (fixed card size limits) | Open a game on a 375x812 screen | Medium | Fixed: board now picks grid and card size from the available space |
 | BUG-02 | Timer mode was blocked on screens under 600px wide ("Needs a bigger screen") | Open Mode screen on a phone | Medium | Fixed: Timer mode works on phones (5x8 grid) |
 | BUG-03 | Background pictures were stretched on phone and tablet shapes, and used a fixed attachment that iOS handles badly | Open any screen on a phone-shaped window | Low | Fixed: backgrounds fill tall screens without stretching, and show the whole picture on landscape screens |
-| BUG-05 | After BUG-03's first fix, wide and short browser windows (for example 1536x650) cut off the bottom of the background (grass and animals) | Open the game in a laptop window shorter than 16:9 | Medium | Fixed: landscape screens show the whole picture again; only tall screens use fill mode |
 | BUG-04 | On a phone in landscape, the Timer card dock squeezed the board to 34px cards | Start Timer mode at 812x375 | Medium | Fixed: dock moves to the side, cards are 51px |
+| BUG-05 | After BUG-03's first fix, wide and short browser windows (for example 1536x650) cut off the bottom of the background (grass and animals) | Open the game in a laptop window shorter than 16:9 | Medium | Fixed: landscape screens show the whole picture again; only tall screens use fill mode |
 
 ## 7. Improvements over the first version
 
@@ -121,4 +133,17 @@ Not tested on real devices or real Safari. Menu, history and how-to screens scro
 - **Responsive design:** the game now works on phones, iPad, laptop and desktop. Card size and grid shape adapt to the screen, and Timer mode is available on phones.
 - **Automated tests:** 167 tests and an `npm test` script. They cover the new features above, since timers, rewards and saved data are the riskiest parts.
 - **README and this QA document.**
-- **Deployed to Vercel.**
+- **Deployed to Vercel** with an Upstash Redis database for the accounts.
+
+## 8. Test summary
+
+| Area | Result |
+| --- | --- |
+| Automated tests | 167 tests in 8 files, all passing |
+| Manual test cases | 10 of 10 pass |
+| Live site (computer and iPad) | Pass: sign-in and the same data on both devices |
+| Responsive layout | Pass in emulation at 7 screen sizes, and on an iPad |
+| Bugs found | 5, all fixed (BUG-01 to BUG-05) |
+| Observations | 8: 2 open (OBS-02, OBS-03), 6 accepted. None block the game |
+
+Known limitations: a 4-digit PIN is not strong security, the last save wins if two devices play at the same time, signing in needs an internet connection, and a real phone was not tested.

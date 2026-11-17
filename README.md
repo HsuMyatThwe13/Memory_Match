@@ -105,7 +105,7 @@ Tips:
 
 ## Deployment
 
-Deployed on Vercel. Vercel detects Vite automatically (build command `npm run build`, output directory `dist`).
+Deployed on Vercel. Vercel detects Vite automatically (build command `npm run build`, output directory `dist`) and runs the functions in `api/`. Player accounts are stored in an Upstash Redis database connected to the Vercel project (see "Setting up the database on Vercel" above).
 
 ## Improvements over the first version
 
