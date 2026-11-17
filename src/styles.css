@@ -1,28 +1,45 @@
 * {
   box-sizing: border-box;
 }
+html {
+  -webkit-text-size-adjust: 100%;
+}
 body {
   margin: 0;
   background: #6db8ff;
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  touch-action: manipulation;
 }
 .screen {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(12px, 3vh, 28px);
-  padding: 20px 20px 12vh;
+  padding: max(20px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) clamp(24px, 12vh, 110px) max(16px, env(safe-area-inset-left));
   font-family: "Segoe UI", Arial, sans-serif;
   font-weight: 700;
   color: #10243a;
+  /* landscape screens: show the whole picture (nothing cut off at the bottom) */
   background-size: 100% 100%;
-  background-attachment: fixed;
+  background-position: center;
   background-repeat: no-repeat;
+}
+/* tall or square screens (phones in portrait): fill the screen without stretching the picture */
+@media (max-aspect-ratio: 5/4) {
+  .screen {
+    background-size: cover;
+  }
 }
 .screen.home {
   justify-content: flex-start;
   padding-top: 56vh;
+  padding-top: 56dvh;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 .top {
@@ -119,7 +136,8 @@ body {
   font-weight: 600;
 }
 .board {
-  --size: clamp(40px, min(calc(80vw / 6 - 10px), calc(46vh / 3)), 120px);
+  --size: 40px;
+  --gap: 8px;
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--size));
   gap: var(--gap);
@@ -682,5 +700,58 @@ button.power:hover:not(:disabled) {
 @media (max-height: 560px) {
   .screen.modescreen {
     padding-top: 120px;
+  }
+}
+
+/* Short screens (phones in landscape) */
+@media (max-height: 480px) {
+  .screen {
+    padding-bottom: 16px;
+  }
+  .screen.modescreen {
+    padding-top: 84px;
+  }
+  .mode {
+    padding: 10px 12px;
+    gap: 4px;
+  }
+  .mode img {
+    width: min(100%, 96px);
+    align-self: center;
+  }
+  .modewrap .title {
+    margin-bottom: 12px;
+  }
+  .hud {
+    margin-bottom: 6px;
+  }
+  .dock {
+    position: fixed;
+    right: max(12px, env(safe-area-inset-right));
+    top: 50%;
+    transform: translateY(-50%);
+    flex-direction: column;
+    flex-wrap: nowrap;
+    z-index: 4;
+  }
+}
+
+/* Small phones */
+@media (max-width: 380px) {
+  .panel {
+    padding: 16px 18px;
+  }
+  .dlg {
+    padding: 18px 20px;
+  }
+  .stats div {
+    gap: 16px;
+  }
+}
+
+/* Large screens: keep content readable instead of stretching */
+@media (min-width: 1600px) {
+  .top {
+    width: min(100%, 1300px);
   }
 }

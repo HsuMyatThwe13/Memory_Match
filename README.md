@@ -7,13 +7,14 @@ A card-matching memory game built with **React 18 + Vite 5** (vibe-coded, fronte
 ## Features
 
 - **Classic mode** – pick a theme (Animals, Fruits, Colors) and a level (Low 4 pairs, Medium 6, High 9). Moves, wrong flips and time are tracked.
-- **Timer mode** – 20 mixed pairs against a 4-minute countdown. Not available on narrow (phone-width) screens.
+- **Timer mode** – 20 mixed pairs against a 4-minute countdown.
 - **Power-up cards** – earned in Classic mode, spent in Timer mode (up to 3 per game):
   - **Peek** (win Low in under 8 moves): reveals all unmatched cards for 3 s.
   - **Auto-Match** (win Medium with 3 or fewer wrong flips): matches one pair for you.
   - **Freeze** (win High with 6 or fewer wrong flips): pauses the timer for 10 s.
 - **Player profiles and History Hub** – progress and the last 50 games per mode are saved in the browser (`localStorage`). Backups can be exported and imported as a JSON file.
 - **Idle protection** – a warning appears after 3 minutes without activity, then the game times out 30 s later.
+- **Responsive layout** – works on phones (portrait and landscape), iPad, laptop and desktop. The card board picks the grid shape and card size that fit the screen, so no scrolling is needed during a game.
 
 ## Getting started
 
@@ -32,7 +33,8 @@ src/
   App.jsx            screen routing and game flow
   screens/           Home, Mode, Theme, Loadout, Game, Result, History, HowToPlay
   components/        reusable UI (Card, Board, Panel, dialogs, ...)
-  hooks/             useMemoryGame (core rules), usePlayer (profiles), useInactivity
+  hooks/             useMemoryGame (core rules), usePlayer (profiles), useInactivity, useViewport
+  layout.js          picks the board grid and card size for the screen
   data/              levels, themes, power-ups, reward rules, idle settings
   storage.js         localStorage load/save, input sanitising, backup import/export
   __tests__/         automated tests (Vitest)
@@ -52,6 +54,7 @@ Automated tests use **Vitest**, **jsdom** and **React Testing Library** with fak
 | Storage and validation | `storage.test.js` | name sanitising, corrupt data, quota failure, invalid backups, prototype-pollution keys |
 | Reward rules and data | `rewards.test.js` | boundary values for every reward, theme data integrity |
 | Idle timeout | `useInactivity.test.js` | warning, timeout, reset, disabled |
+| Responsive layout | `layout.test.js` | board grid fits phone, iPad, laptop and desktop sizes at every card count; size limits |
 | Helpers | `utils.test.js` | time format, shuffle |
 
 ## How to test
@@ -64,7 +67,7 @@ npm test         # run all tests once (about 5 seconds)
 npm run test:watch   # re-run automatically when you save a file
 ```
 
-A passing run ends with `Test Files 6 passed` and `Tests 73 passed`. These tests check the game logic, not the screens.
+A passing run ends with `Test Files 7 passed` and `Tests 105 passed`. These tests check the game logic, not the screens.
 
 ### Manual tests
 
@@ -76,7 +79,7 @@ A passing run ends with `Test Files 6 passed` and `Tests 73 passed`. These tests
 Tips:
 - The "win" and "lose" links in Timer mode end a game instantly, so you do not have to wait 4 minutes.
 - The "inactive for 3 mins" link in Classic mode triggers the idle warning right away.
-- For a phone-width screen, press F12, then Ctrl+Shift+M (device mode).
+- For phone, iPad and laptop sizes, press F12, then Ctrl+Shift+M (device mode) and pick a device.
 - For storage-blocked behaviour, use a private window.
 
 ## Deployment
