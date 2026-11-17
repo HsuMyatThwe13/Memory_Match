@@ -12,13 +12,13 @@ Stack: React 18 + Vite 5 frontend, Vercel serverless API (`api/`) with an Upstas
 | Functional (manual) | 10 test cases in the browser (section 4) | Done, all 10 pass (also tested on the live site on a computer and an iPad) |
 | Boundary value testing | Reward thresholds, 12-character names, 4-digit PIN lengths, 50-entry history cap, 999 card cap, PIN lockout after 8 tries | Done, automated |
 | Negative/security testing | Wrong and malformed PINs, taken nicknames, case-sensitive nicknames, PIN lockout, PIN hashing, tampered progress, refresh that must not create accounts, corrupt `localStorage`, markup in names, `__proto__` keys, storage and server failures | Done, automated |
-| Regression | `npm test` runs all 167 tests in about 5 seconds | Done |
+| Regression | `npm test` runs all 178 tests in about 7 seconds | Done |
 
 Out of scope: load/performance testing and end-to-end browser automation (not set up). The automated tests use an in-memory copy of the database with the same behaviour; the real Upstash database was checked by hand on the live site (section 4).
 
 ## 2. Automated test results
 
-Run with `npm test`. Last run: **8 files, 167 tests, all passing**.
+Run with `npm test`. Last run: **9 files, 178 tests, all passing**.
 
 | File | Tests |
 | --- | --- |
@@ -30,11 +30,13 @@ Run with `npm test`. Last run: **8 files, 167 tests, all passing**.
 | `api.test.js` | 49 |
 | `useMemoryGame.test.js` | 21 |
 | `layout.test.js` | 32 |
+| `ProfileMenu.test.jsx` | 11 |
 
 Output of `npm test` (Vitest v2.1.9):
 
 ```
  ✓ src/__tests__/layout.test.js (32 tests)
+ ✓ src/__tests__/ProfileMenu.test.jsx (11 tests)
  ✓ src/__tests__/utils.test.js (9 tests)
  ✓ src/__tests__/storage.test.js (15 tests)
  ✓ src/__tests__/rewards.test.js (8 tests)
@@ -43,9 +45,9 @@ Output of `npm test` (Vitest v2.1.9):
  ✓ src/__tests__/useMemoryGame.test.js (21 tests)
  ✓ src/__tests__/usePlayer.test.js (30 tests)
 
- Test Files  8 passed (8)
-      Tests  167 passed (167)
-   Duration  5.57s
+ Test Files  9 passed (9)
+      Tests  178 passed (178)
+   Duration  6.88s
 ```
 
 Notable behaviours verified:
@@ -72,7 +74,7 @@ Clear site data (`localStorage` key `memorymatch:v1`) or use a private window be
 | TC-07 | Benefit cards in Timer mode | Use Peek, Auto-Match and Freeze | Peek shows cards about 3 s; Auto-Match matches one pair; Freeze holds the clock 10 s; each card count drops by 1 | Pass |
 | TC-08 | Idle protection | Leave a game untouched for 3 minutes, then respond or ignore | Warning dialog with 30 s countdown; responding continues the game; ignoring ends it | Pass |
 | TC-09 | History Hub | Play several games, open History Hub | Newest games first, with card counts | Pass |
-| TC-10 | Account menu | In History Hub: press Reset progress and confirm; press Sign out and cancel, then confirm; sign in again and press Delete account, cancel, then confirm; then use the same nickname again | Reset clears cards and history; Sign out returns to the nickname step and needs the PIN again; Delete removes the account and its data on every device, and the nickname can be created again with a new PIN and starts empty | Pass |
+| TC-10 | Profile menu and reset | On Home, tap the Profile button (icon and text, top right): check the card (name, cards, game counts); press Switch account, cancel, then confirm; sign in again and press Delete account (red), cancel, then confirm; use the same nickname again. In History Hub press Reset progress and confirm | The card shows the right numbers; Switch account returns to the nickname step and needs the PIN again; Delete removes the account everywhere and the nickname can be created again with a new PIN and starts empty; Reset clears cards and history; History Hub has only the Reset progress button, on the right | Pass |
 
 ### Responsive checks
 
@@ -124,14 +126,16 @@ Layout was checked with device-size emulation (table above) and on the iPad. A r
 | BUG-03 | Background pictures were stretched on phone and tablet shapes, and used a fixed attachment that iOS handles badly | Open any screen on a phone-shaped window | Low | Fixed: backgrounds fill tall screens without stretching, and show the whole picture on landscape screens |
 | BUG-04 | On a phone in landscape, the Timer card dock squeezed the board to 34px cards | Start Timer mode at 812x375 | Medium | Fixed: dock moves to the side, cards are 51px |
 | BUG-05 | After BUG-03's first fix, wide and short browser windows (for example 1536x650) cut off the bottom of the background (grass and animals) | Open the game in a laptop window shorter than 16:9 | Medium | Fixed: landscape screens show the whole picture again; only tall screens use fill mode |
+| BUG-06 | Buttons inside popups on the Home screen (profile card, confirm boxes) were as large as the big Home buttons, because that style also applied inside popups | Open the profile card on the Home screen | Low | Fixed: popup buttons have their own small size |
+| BUG-07 | After a page reload in a signed-in tab, the automatic refresh could quietly create an account if the server no longer had it | Reload the page after the account was removed on the server | Medium | Fixed: the refresh is "open only" and signs the player out instead; covered by tests |
 
 ## 7. Improvements over the first version
 
 - **Benefit cards (power-ups):** Peek, Auto-Match and Freeze are earned by playing well in Classic mode and spent in Timer mode. This adds rewards, strategy and a reason to replay.
 - **Timer mode:** a 4-minute challenge with 20 mixed pairs, so the game has a timed challenge as well as a relaxed mode.
-- **Accounts with nickname and PIN:** the game asks for the nickname first, then the PIN. Nicknames are case sensitive, and a nickname opens only with its own PIN. The same nickname and PIN show the same cards and history on every device (phone, iPad, laptop). Players can sign out or delete their account from the History Hub. The server stores a salted hash of the PIN, locks an account after 8 wrong PINs, and validates all saved data.
+- **Accounts with nickname and PIN:** the game asks for the nickname first, then the PIN. Nicknames are case sensitive, and a nickname opens only with its own PIN. The same nickname and PIN show the same cards and history on every device (phone, iPad, laptop). Players open their profile card from the Profile button on the Home screen to switch account or delete their account (a red button, with a confirmation). The server stores a salted hash of the PIN, locks an account after 8 wrong PINs, and validates all saved data.
 - **Responsive design:** the game now works on phones, iPad, laptop and desktop. Card size and grid shape adapt to the screen, and Timer mode is available on phones.
-- **Automated tests:** 167 tests and an `npm test` script. They cover the new features above, since timers, rewards and saved data are the riskiest parts.
+- **Automated tests:** 178 tests and an `npm test` script. They cover the new features above, since timers, rewards and saved data are the riskiest parts.
 - **README and this QA document.**
 - **Deployed to Vercel** with an Upstash Redis database for the accounts.
 
@@ -139,11 +143,11 @@ Layout was checked with device-size emulation (table above) and on the iPad. A r
 
 | Area | Result |
 | --- | --- |
-| Automated tests | 167 tests in 8 files, all passing |
+| Automated tests | 178 tests in 9 files, all passing |
 | Manual test cases | 10 of 10 pass |
 | Live site (computer and iPad) | Pass: sign-in and the same data on both devices |
 | Responsive layout | Pass in emulation at 7 screen sizes, and on an iPad |
-| Bugs found | 5, all fixed (BUG-01 to BUG-05) |
+| Bugs found | 7, all fixed (BUG-01 to BUG-07) |
 | Observations | 8: 2 open (OBS-02, OBS-03), 6 accepted. None block the game |
 
-Known limitations: a 4-digit PIN is not strong security, the last save wins if two devices play at the same time, signing in needs an internet connection, and a real phone was not tested.
+Known limitations: a 4-digit PIN is not strong security, the last save wins if two devices play at the same time, signing in needs an internet connection.

@@ -27,22 +27,9 @@ function Table({ label, head, rows }) {
   );
 }
 
-export default function HistoryScreen({ name, profile, saved, onBack, onReset, onSignOut, onDelete }) {
+export default function HistoryScreen({ name, profile, saved, onBack, onReset }) {
   const [message, setMessage] = useState("");
   const [confirming, setConfirming] = useState(false);
-  const [signingOut, setSigningOut] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  const deleteAccount = async () => {
-    setBusy(true);
-    const result = await onDelete();
-    if (!result.ok) {
-      setBusy(false);
-      setDeleting(false);
-      setMessage(result.error);
-    }
-  };
 
   const classic = profile.classic.map((e) => [
     date(e.ts), labelOf(THEMES, e.theme), labelOf(LEVELS, e.level), e.moves, fmt(e.time), cardNames(e.earned),
@@ -70,24 +57,13 @@ export default function HistoryScreen({ name, profile, saved, onBack, onReset, o
           <h2>Timer History</h2>
           <Table label="Timer history" head={["Date", "Result", "Left / found", "Cards used"]} rows={timer} />
         </Panel>
-        <div className="row">
+        <div className="row hubactions">
           <Button onClick={() => setConfirming(true)}>Reset progress</Button>
-          <Button onClick={() => setSigningOut(true)}>Sign out</Button>
-          <Button onClick={() => setDeleting(true)}>Delete account</Button>
         </div>
         <p className="msg" role="status">
           {message || (saved ? "" : "Your latest progress could not be saved to the server. It will try again after your next game.")}
         </p>
       </div>
-      {signingOut && (
-        <ConfirmDialog title="Sign out?" confirmLabel="Sign out" onCancel={() => setSigningOut(false)}
-          text={`You will need the nickname and PIN to open ${name} again.`} onConfirm={onSignOut} />
-      )}
-      {deleting && (
-        <ConfirmDialog title="Delete account?" confirmLabel={busy ? "Deleting..." : "Delete"} onCancel={() => !busy && setDeleting(false)}
-          text={`This permanently deletes ${name} and all its cards and history on every device. It cannot be undone.`}
-          onConfirm={() => !busy && deleteAccount()} />
-      )}
       {confirming && (
         <ConfirmDialog title="Reset progress?" confirmLabel="Reset" onCancel={() => setConfirming(false)}
           text={`This clears all cards and history for ${name}. It cannot be undone.`}

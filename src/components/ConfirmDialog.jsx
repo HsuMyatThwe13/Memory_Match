@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Button from "./Button";
 
-export default function ConfirmDialog({ title, text, confirmLabel, cancelLabel = "Cancel", confirmFirst, onConfirm, onCancel }) {
+export default function ConfirmDialog({ title, text, confirmLabel, cancelLabel = "Cancel", confirmFirst, danger, onConfirm, onCancel }) {
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onCancel();
     window.addEventListener("keydown", onKey);
@@ -15,7 +15,7 @@ export default function ConfirmDialog({ title, text, confirmLabel, cancelLabel =
         <p id="cd-text">{text}</p>
         <div className={`row${confirmFirst ? " reverse" : ""}`}>
           <Button autoFocus onClick={onCancel}>{cancelLabel}</Button>
-          <Button onClick={onConfirm}>{confirmLabel}</Button>
+          <Button danger={danger} onClick={onConfirm}>{confirmLabel}</Button>
         </div>
       </div>
     </div>

@@ -12,7 +12,7 @@ A card-matching memory game built with **React 18 + Vite 5** (vibe-coded) with a
   - **Peek** (win Low in under 8 moves): reveals all unmatched cards for 3 s.
   - **Auto-Match** (win Medium with 3 or fewer wrong flips): matches one pair for you.
   - **Freeze** (win High with 6 or fewer wrong flips): pauses the timer for 10 s.
-- **Accounts and History Hub** – the game first asks for your nickname, then for a 4-digit PIN. A new nickname is created with the PIN you choose; an existing nickname opens only with its own PIN. Nicknames are case sensitive (`ann` and `Ann` are different players). Your cards and the last 50 games per mode show on any device where you sign in with the matching nickname and PIN. In the History Hub you can reset your progress, sign out, or permanently delete your account (the nickname can then be used again).
+- **Accounts, profile and History Hub** – the game first asks for your nickname, then for a 4-digit PIN. A new nickname is created with the PIN you choose; an existing nickname opens only with its own PIN. Nicknames are case sensitive (`ann` and `Ann` are different players). Your cards and the last 50 games per mode show on any device where you sign in with the matching nickname and PIN. The Profile button (icon and text) near the top right of the Home screen opens your profile card (name, cards and game counts) with **Switch account** and a red **Delete account** (the nickname can then be used again). The History Hub shows your cards and history, with a **Reset progress** button.
 - **Idle protection** – a warning appears after 3 minutes without activity, then the game times out 30 s later.
 - **Responsive layout** – works on phones (portrait and landscape), iPad, laptop and desktop. The card board picks the grid shape and card size that fit the screen, so no scrolling is needed during a game.
 
@@ -76,6 +76,7 @@ Automated tests use **Vitest**, **jsdom** and **React Testing Library** with fak
 | Reward rules and data | `rewards.test.js` | boundary values for every reward, theme data integrity |
 | Idle timeout | `useInactivity.test.js` | warning, timeout, reset, disabled |
 | Responsive layout | `layout.test.js` | board grid fits phone, iPad, laptop and desktop sizes at every card count; size limits |
+| Profile menu | `ProfileMenu.test.jsx` | profile button, card numbers, close with button / Escape / outside click, sign-out and delete confirmations, cancel, failed delete message |
 | Helpers | `utils.test.js` | time format, shuffle |
 
 ## How to test
@@ -88,7 +89,7 @@ npm test         # run all tests once (about 5 seconds)
 npm run test:watch   # re-run automatically when you save a file
 ```
 
-A passing run ends with `Test Files 8 passed` and `Tests 167 passed`. These tests check the game logic, not the screens.
+A passing run ends with `Test Files 9 passed` and `Tests 178 passed`. These tests check the game logic, not the screens.
 
 ### Manual tests
 

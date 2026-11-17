@@ -74,9 +74,9 @@ button {
   box-shadow: 0 1px 0 #c78f00;
 }
 .home .btn {
-  font-size: clamp(20px, 4vw, 34px);
-  padding: 10px clamp(32px, 6vw, 64px);
-  min-height: 56px;
+  font-size: clamp(15px, 2.6vw, 22px);
+  padding: 6px clamp(22px, 4vw, 40px);
+  min-height: 42px;
 }
 :focus-visible {
   outline: 5px solid #1d4ed8;
@@ -794,4 +794,161 @@ button.power:hover:not(:disabled) {
 .nick:focus,
 .nick:focus-visible {
   outline: none;
+}
+
+/* Home: signed-in buttons sit a bit lower */
+.screen.home.in {
+  padding-top: 62vh;
+  padding-top: 62dvh;
+}
+
+/* Profile button (top right of Home) and profile card */
+/* The Profile button uses the same .btn look and size as Play Game; this only places it and lines up the icon */
+.profilebtn {
+  position: fixed;
+  top: max(36px, env(safe-area-inset-top));
+  right: max(46px, env(safe-area-inset-right));
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.profilebtn svg {
+  display: block;
+  flex: none;
+  width: 1.15em;
+  height: 1.15em;
+}
+.pcard {
+  position: relative;
+  width: min(92vw, 320px);
+  gap: 8px;
+  padding: 18px 20px;
+}
+.pclose {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 22px;
+  line-height: 1;
+  font-weight: 700;
+  color: #3b2410;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.pavatar {
+  width: 68px;
+  height: 68px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #ffc107;
+  border: 3px solid #e6a800;
+  box-shadow: 0 3px 0 #c78f00;
+}
+.pname {
+  font-size: 20px;
+  word-break: break-word;
+}
+.pstats {
+  margin: 0;
+  width: 100%;
+  display: grid;
+  gap: 3px;
+  font-size: 14px;
+}
+.pstats div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 2px dashed #d4c9a0;
+  padding-bottom: 2px;
+}
+.pstats dt {
+  font-weight: 400;
+}
+.pstats dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* History Hub: the only button (Reset progress) sits on the right */
+.hub > .row.hubactions {
+  justify-content: flex-end;
+}
+
+/* Profile card on short screens (phone in landscape): smaller and two columns */
+.pcard {
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+}
+@media (max-height: 480px) {
+  .pcard {
+    width: min(92vw, 420px);
+    padding: 12px 16px;
+    gap: 6px;
+  }
+  .pavatar {
+    width: 44px;
+    height: 44px;
+  }
+  .pavatar svg {
+    width: 26px;
+    height: 26px;
+  }
+  .pstats {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+  }
+}
+
+/* Buttons inside popups are smaller than the big Home buttons */
+.dlg .btn,
+.home .dlg .btn {
+  font-size: 14px;
+  padding: 3px 16px;
+  min-height: 34px;
+  border-width: 2px;
+  box-shadow: 0 2px 0 #c78f00;
+}
+.dlg .row {
+  gap: 8px;
+}
+.home .pcard .btn {
+  font-size: 13px;
+  padding: 3px 12px;
+}
+
+/* Red button for destructive actions (Delete account) */
+.btn.danger,
+.dlg .btn.danger,
+.home .dlg .btn.danger,
+.home .pcard .btn.danger {
+  background: #e53935;
+  border-color: #b71c1c;
+  box-shadow: 0 3px 0 #8e1212;
+  text-shadow: 1px 1px 0 #8e1212;
+}
+.dlg .btn.danger,
+.home .dlg .btn.danger,
+.home .pcard .btn.danger {
+  box-shadow: 0 2px 0 #8e1212;
+}
+.btn.danger:hover:not(:disabled),
+.home .dlg .btn.danger:hover:not(:disabled) {
+  background: #ef5350;
+  border-color: #c62828;
+}
+
+/* Profile button: same height, font and shape as Play Game, but the width fits its content */
+.home .btn.profilebtn {
+  width: auto;
+  padding-left: 16px;
+  padding-right: 16px;
 }
