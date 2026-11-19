@@ -425,7 +425,7 @@ button {
 }
 .power {
   --tone: #2e7d32;
-  width: clamp(90px, 16vw, 130px);
+  width: clamp(112px, 16vw, 130px);
   padding: 8px 6px;
   font: inherit;
   color: var(--tone);
@@ -461,13 +461,17 @@ button.power:hover:not(:disabled) {
   filter: grayscale(0.6);
 }
 .power.small {
-  width: clamp(64px, 9vw, 92px);
+  width: clamp(88px, 9vw, 96px);
   padding: 4px;
   border-width: 3px;
 }
 .pname {
   font-weight: 700;
-  font-size: clamp(12px, 2vw, 16px);
+  font-size: clamp(13px, 2vw, 16px);
+  white-space: nowrap;
+}
+.power.small .pname {
+  font-size: 12px;
 }
 .prarity,
 .pcount,
